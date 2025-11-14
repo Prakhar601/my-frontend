@@ -1,0 +1,174 @@
+[
+  {
+    "id": "p1",
+    "title": "Monochrome Arrow Jersey",
+    "description": "A sleek white performance jersey with precision chevron accents for modern teams.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (4).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (4).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p2",
+    "title": "Teal Gradient Velocity Jersey",
+    "description": "Dynamic teal gradient with aerodynamic lines — built for comfort and speed.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (3).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (3).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p3",
+    "title": "Violet Motion Strike Jersey",
+    "description": "Bold purple brushstroke design with high-contrast accents for dynamic presence.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (2).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (2).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p4",
+    "title": "Phantom Black Geo Jersey",
+    "description": "Subtle geometric texture on deep black fabric for a low-key professional look.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (1).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM (1).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p5",
+    "title": "Skyline Silver Stripe Jersey",
+    "description": "Fresh silver-and-blue diagonal stripe for clean, contemporary style on the field.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM.jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.47 PM.jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p6",
+    "title": "Navy Night Camo Jersey",
+    "description": "Deep navy textured camo with premium print, engineered for rugged performance.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (3).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (3).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p7",
+    "title": "Arctic Breeze Accent Jersey",
+    "description": "Crisp white base with cool blue accents for a refined, athletic aesthetic.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (2).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (2).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p8",
+    "title": "Storm Grey Dynamic Jersey",
+    "description": "Sharp storm-grey pattern with energetic strokes for a modern, aggressive finish.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (1).jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM (1).jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  },
+  {
+    "id": "p9",
+    "title": "Magenta Flash Pro Jersey",
+    "description": "Dark magenta and violet contrast for a high-energy, standout team kit.",
+    "price": 49.99,
+    "thumbnails": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM.jpeg"],
+    "images": ["/product-images/WhatsApp Image 2025-11-14 at 9.27.46 PM.jpeg"],
+    "variants": [
+      {
+        "id": "v1",
+        "label": "Standard",
+        "price": 49.99
+      }
+    ],
+    "colors": ["#ffffff", "#000000", "#1e40af", "#10b981", "#ff006e"],
+    "fonts": ["Arial", "Poppins", "Montserrat"],
+    "sizes": ["S", "M", "L", "XL"],
+    "masks": ["full", "half"]
+  }
+]
+

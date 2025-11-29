@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import useApi from '../hooks/useApi';
 import useCart from '../hooks/useCart';
 import JerseyCanvas from '../components/JerseyCanvas';
-import Jersey3D from '../components/Jersey3D';
+// POLISH UPDATE - Removed static import, using lazy loading for 3D preview
 import LoaderStitch from '../components/LoaderStitch';
 
 export default function CustomizePage() {
@@ -23,12 +23,17 @@ export default function CustomizePage() {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedVariant, setSelectedVariant] = useState('');
   const [sleeveStyle, setSleeveStyle] = useState('full'); // 'full' | 'half'
+  const [collarStyle, setCollarStyle] = useState('regular'); // 'regular' | 'collared'
   const [enable3D, setEnable3D] = useState(false); // 3D preview toggle
   const [webGLSupported, setWebGLSupported] = useState(false); // WebGL support check
   const jerseyCanvasRef = useRef(null);
   const jersey3DRef = useRef(null);
 
-  // Check WebGL support and detect mobile devices
+  // POLISH UPDATE - Lazy load 3D support check and dynamic import
+  const [threeJsLoaded, setThreeJsLoaded] = useState(false);
+  const [threeJsError, setThreeJsError] = useState(false);
+  const Jersey3DLazy = useRef(null);
+
   useEffect(() => {
     // Check WebGL support
     let isWebGLSupported = false;
@@ -49,6 +54,20 @@ export default function CustomizePage() {
       setEnable3D(false);
     }
   }, []);
+
+  // Lazy load Three.js when 3D is enabled
+  useEffect(() => {
+    if (enable3D && webGLSupported && !threeJsLoaded && !threeJsError) {
+      import('../components/Jersey3D').then((module) => {
+        Jersey3DLazy.current = module.default;
+        setThreeJsLoaded(true);
+      }).catch((err) => {
+        console.error('Failed to load 3D preview:', err);
+        setThreeJsError(true);
+        setEnable3D(false);
+      });
+    }
+  }, [enable3D, webGLSupported, threeJsLoaded, threeJsError]);
 
   useEffect(() => {
     let isMounted = true;
@@ -111,6 +130,7 @@ export default function CustomizePage() {
         size: selectedSize,
         variant: selectedVariant,
         sleeveStyle: sleeveStyle,
+        collarStyle: collarStyle,
       },
       quantity: 1,
       price: priceFromVariant ?? 0,
@@ -132,8 +152,8 @@ export default function CustomizePage() {
       <section className="preview-pane">
         <div className="preview-canvas">
           {baseImage ? (
-            enable3D ? (
-              <Jersey3D
+            enable3D && threeJsLoaded && Jersey3DLazy.current ? (
+              <Jersey3DLazy.current
                 ref={jersey3DRef}
                 baseImageUrl={baseImage}
                 colorHex={selectedColor}
@@ -144,6 +164,14 @@ export default function CustomizePage() {
                 textColor={textColor}
                 sleeveStyle={sleeveStyle}
               />
+            ) : enable3D && !threeJsLoaded && !threeJsError ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                Loading 3D preview...
+              </div>
+            ) : enable3D && threeJsError ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                3D preview not supported — using 2D preview
+              </div>
             ) : (
               <JerseyCanvas
                 ref={jerseyCanvasRef}
@@ -155,6 +183,7 @@ export default function CustomizePage() {
                 fontSize={fontSize}
                 textColor={textColor}
                 sleeveStyle={sleeveStyle}
+                collarStyle={collarStyle}
               />
             )
           ) : (
@@ -177,24 +206,54 @@ export default function CustomizePage() {
           )}
           {/* Sleeve Style Toggle */}
           <div className="mask-toggle">
-            <label>
-              <input
-                type="radio"
-                name="sleeve"
-                checked={sleeveStyle === 'full'}
-                onChange={() => setSleeveStyle('full')}
-              />{' '}
-              Full Sleeve
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="sleeve"
-                checked={sleeveStyle === 'half'}
-                onChange={() => setSleeveStyle('half')}
-              />{' '}
-              Half Sleeve
-            </label>
+            <div className="toggle-group">
+              <label>Sleeve:</label>
+              <div className="radio-group">
+                <label>
+                  <input
+                    type="radio"
+                    name="sleeve"
+                    checked={sleeveStyle === 'full'}
+                    onChange={() => setSleeveStyle('full')}
+                  />
+                  <span>Full</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="sleeve"
+                    checked={sleeveStyle === 'half'}
+                    onChange={() => setSleeveStyle('half')}
+                  />
+                  <span>Half</span>
+                </label>
+              </div>
+            </div>
+            
+            {/* Collar Style Toggle */}
+            <div className="toggle-group">
+              <label>Collar:</label>
+              <div className="radio-group">
+                <label>
+                  <input
+                    type="radio"
+                    name="collar"
+                    checked={collarStyle === 'regular'}
+                    onChange={() => setCollarStyle('regular')}
+                  />
+                  <span>Regular</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="collar"
+                    checked={collarStyle === 'collared'}
+                    onChange={() => setCollarStyle('collared')}
+                  />
+                  <span>Collared</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -305,7 +364,41 @@ export default function CustomizePage() {
           </div>
         )}
 
-        <button className="primary" onClick={handleAddToCart}>Add to Cart</button>
+        {/* POLISH UPDATE - Added Reset and Save buttons */}
+        <div className="control-actions">
+          <button 
+            className="button-secondary" 
+            onClick={() => {
+              setSelectedColor(product?.colors?.[0] || '');
+              setNameText('');
+              setNumberText('');
+              setSelectedFont(product?.fonts?.[0] || '');
+              setFontSize(24);
+              setTextColor('#FFFFFF');
+              setSleeveStyle('full');
+              setCollarStyle('regular');
+            }}
+          >
+            Reset
+          </button>
+          <button 
+            className="button-secondary"
+            onClick={() => {
+              if (jerseyCanvasRef.current) {
+                const dataUrl = jerseyCanvasRef.current.exportImage();
+                if (dataUrl) {
+                  const link = document.createElement('a');
+                  link.download = `jersey-${product?.id || 'custom'}.png`;
+                  link.href = dataUrl;
+                  link.click();
+                }
+              }
+            }}
+          >
+            Save Image
+          </button>
+          <button className="button-primary" onClick={handleAddToCart}>Add to Cart</button>
+        </div>
       </aside>
     </div>
   );

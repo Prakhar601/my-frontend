@@ -1,6 +1,8 @@
+// change: Design system - added Footer component; revert: remove Footer import and usage
 import { Routes, Route } from 'react-router-dom';
 import { CartProvider } from './hooks/useCart';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import LandingPage from './pages/LandingPage';
 import CustomizePage from './pages/CustomizePage';
 import CartPage from './pages/CartPage';
@@ -21,6 +23,7 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
             </Routes>
           </main>
+          <Footer />
         </div>
       </CartProvider>
     );

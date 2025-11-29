@@ -1,4 +1,8 @@
+// POLISH UPDATE - Enhanced JerseyCanvas with mask support, improved text alignment, and collar option
 import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import { calculateFontScale, getContrastColor } from '../utils/canvasHelpers';
+import maskFullSvg from '../assets/masks/mask_full.svg';
+import maskHalfSvg from '../assets/masks/mask_half.svg';
 
 /**
  * JerseyCanvas - Canvas-based jersey customization preview component
@@ -12,6 +16,7 @@ import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
  * - fontSize: Font size for name (number will be larger)
  * - textColor: Color for text
  * - sleeveStyle: 'full' or 'half' for sleeve style
+ * - collarStyle: 'regular' or 'collared' for collar style
  */
 const JerseyCanvas = forwardRef(({
   baseImageUrl,
@@ -22,12 +27,15 @@ const JerseyCanvas = forwardRef(({
   fontSize = 24,
   textColor = '#FFFFFF',
   sleeveStyle = 'full',
+  collarStyle = 'regular',
 }, ref) => {
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imageRef = useRef(null);
+  const maskImageRef = useRef(null);
   const renderTimeoutRef = useRef(null);
   const isImageLoadedRef = useRef(false);
+  const isMaskLoadedRef = useRef(false);
   const errorRef = useRef(null);
   const renderFnRef = useRef(null);
 
@@ -81,6 +89,24 @@ const JerseyCanvas = forwardRef(({
     };
     img.src = baseImageUrl;
   }, [baseImageUrl]);
+
+  // Load mask image based on sleeve and collar style
+  useEffect(() => {
+    const maskUrl = sleeveStyle === 'half' ? maskHalfSvg : maskFullSvg;
+    const maskImg = new Image();
+    maskImg.crossOrigin = 'anonymous';
+    maskImg.onload = () => {
+      maskImageRef.current = maskImg;
+      isMaskLoadedRef.current = true;
+      render();
+    };
+    maskImg.onerror = () => {
+      console.warn('Failed to load mask, using default');
+      isMaskLoadedRef.current = false;
+      render();
+    };
+    maskImg.src = maskUrl;
+  }, [sleeveStyle, collarStyle]);
 
   // Render function (can be called synchronously for export)
   const render = (sync = false) => {
@@ -172,50 +198,35 @@ const JerseyCanvas = forwardRef(({
       // Draw base image to offscreen canvas
       offscreenCtx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-      // Apply color tint if colorHex is provided
+      // POLISH UPDATE - Apply color tint using mask to only color jersey area
       if (currentColorHex && currentColorHex !== 'transparent' && currentColorHex !== '') {
-        // Apply color overlay with multiply blend for jersey tinting
         offscreenCtx.save();
-        offscreenCtx.globalCompositeOperation = 'multiply';
-        offscreenCtx.globalAlpha = 0.6;
-        offscreenCtx.fillStyle = currentColorHex;
         
-        // For half sleeves, exclude sleeve areas from color overlay
-        if (currentSleeveStyle === 'half') {
-          // Create a path that excludes the outer parts of sleeves
-          offscreenCtx.beginPath();
-          // Main body area
-          offscreenCtx.rect(
-            drawX + drawWidth * 0.2,
-            drawY,
-            drawWidth * 0.6,
-            drawHeight
+        // Create a temporary canvas for the color layer
+        const colorCanvas = document.createElement('canvas');
+        colorCanvas.width = width * dpr;
+        colorCanvas.height = height * dpr;
+        const colorCtx = colorCanvas.getContext('2d');
+        colorCtx.scale(dpr, dpr);
+        
+        // Fill with color
+        colorCtx.fillStyle = currentColorHex;
+        colorCtx.fillRect(drawX, drawY, drawWidth, drawHeight);
+        
+        // Apply mask if available
+        if (isMaskLoadedRef.current && maskImageRef.current) {
+          colorCtx.globalCompositeOperation = 'destination-in';
+          colorCtx.drawImage(
+            maskImageRef.current,
+            drawX, drawY, drawWidth, drawHeight
           );
-          // Left sleeve (inner part only)
-          offscreenCtx.ellipse(
-            drawX + drawWidth * 0.15,
-            drawY + drawHeight * 0.25,
-            drawWidth * 0.08,
-            drawHeight * 0.15,
-            0,
-            0,
-            Math.PI * 2
-          );
-          // Right sleeve (inner part only)
-          offscreenCtx.ellipse(
-            drawX + drawWidth * 0.85,
-            drawY + drawHeight * 0.25,
-            drawWidth * 0.08,
-            drawHeight * 0.15,
-            0,
-            0,
-            Math.PI * 2
-          );
-          offscreenCtx.fill('evenodd');
-        } else {
-          // Full sleeve - apply color to entire jersey
-          offscreenCtx.fillRect(drawX, drawY, drawWidth, drawHeight);
         }
+        
+        // Blend the colored layer onto the jersey with multiply
+        offscreenCtx.globalCompositeOperation = 'multiply';
+        offscreenCtx.globalAlpha = 0.5;
+        offscreenCtx.drawImage(colorCanvas, 0, 0);
+        
         offscreenCtx.restore();
       }
 
@@ -236,28 +247,36 @@ const JerseyCanvas = forwardRef(({
 
         offscreenCtx.textAlign = 'center';
         offscreenCtx.textBaseline = 'middle';
+        
+        // Calculate font scale based on canvas size
+        const fontScale = calculateFontScale(width);
+        const scaledFontSize = currentFontSize * fontScale;
+        
+        // Auto-determine stroke color for contrast
+        const strokeColor = getContrastColor(currentTextColor);
         offscreenCtx.fillStyle = currentTextColor;
-        offscreenCtx.strokeStyle = '#000000';
-        offscreenCtx.lineWidth = 2;
+        offscreenCtx.strokeStyle = strokeColor;
 
         const centerX = drawX + drawWidth / 2;
-        const nameY = drawY + drawHeight * 0.65;
-        const numberY = drawY + drawHeight * 0.75;
+        // POLISH UPDATE - Improved text positioning: number at 0.55, name at 0.68
+        const numberY = drawY + drawHeight * 0.55;
+        const nameY = drawY + drawHeight * 0.68;
 
-        // Draw name
-        if (currentNameText) {
-          offscreenCtx.font = `bold ${currentFontSize}px ${currentFontFamily}, Arial, sans-serif`;
-          offscreenCtx.strokeText(currentNameText, centerX, nameY);
-          offscreenCtx.fillText(currentNameText, centerX, nameY);
-        }
-
-        // Draw number (larger)
+        // Draw number first (larger, behind name visually)
         if (currentNumberText) {
-          const numberSize = currentFontSize * 1.8;
+          const numberSize = scaledFontSize * 1.8;
           offscreenCtx.font = `bold ${numberSize}px ${currentFontFamily}, Arial, sans-serif`;
-          offscreenCtx.lineWidth = 3;
+          offscreenCtx.lineWidth = Math.max(2, 3 * fontScale);
           offscreenCtx.strokeText(currentNumberText, centerX, numberY);
           offscreenCtx.fillText(currentNumberText, centerX, numberY);
+        }
+
+        // Draw name (smaller, below number)
+        if (currentNameText) {
+          offscreenCtx.font = `bold ${scaledFontSize}px ${currentFontFamily}, Arial, sans-serif`;
+          offscreenCtx.lineWidth = Math.max(1, 2 * fontScale);
+          offscreenCtx.strokeText(currentNameText, centerX, nameY);
+          offscreenCtx.fillText(currentNameText, centerX, nameY);
         }
 
         offscreenCtx.restore();
@@ -314,7 +333,7 @@ const JerseyCanvas = forwardRef(({
         clearTimeout(renderTimeoutRef.current);
       }
     };
-  }, [colorHex, nameText, numberText, fontFamily, fontSize, textColor, sleeveStyle]);
+  }, [colorHex, nameText, numberText, fontFamily, fontSize, textColor, sleeveStyle, collarStyle]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
